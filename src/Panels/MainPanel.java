@@ -8,19 +8,22 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import main.Menu;
+import textUI.TextUI;
 
 public class MainPanel extends JPanel{
-  private JButton backToMenuBtn;
+  private JButton backToMenuBtn, savingOpt;
   public JPanel colorSquare;
-  public JPanel sidebar, gridPanel;
+  public JPanel sidebar, gridPanel, textPanel;
   private final int rows;
   private final int cols;
   private final JPanel[][] squares;
   public Color pencil;
+
 
   public JSlider redSlider = new JSlider(0, 255),
    greenSlider = new JSlider(0, 255),
@@ -36,22 +39,25 @@ public class MainPanel extends JPanel{
     gridPanel = new JPanel();
     gridPanel.setLayout(new GridLayout(rows, cols));
     gridPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-    sidebar.setPreferredSize(new Dimension(300, 600));
+    sidebar.setPreferredSize(new Dimension(220, 1));
     sidebar.setBackground(Color.darkGray);
 
+    textPanel = new JPanel();
+    textPanel.setPreferredSize(new Dimension(1, 25));
+    textPanel.setBackground(Color.darkGray);
+    
     backToMenuBtn = new JButton("Back to Menu");
     backToMenuBtn.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-            // Remove the sidebar and grid and add the menu
-            Container parent = sidebar.getParent();
-            parent.removeAll();
-            parent.add(new Menu(), BorderLayout.CENTER);
-            parent.revalidate();
-            parent.repaint();
-        }
+      public void actionPerformed(ActionEvent e) {
+        // Remove the sidebar and grid and add the menu
+        Container parent = sidebar.getParent();
+        parent.removeAll();
+        parent.add(new Menu(), BorderLayout.CENTER);
+        parent.revalidate();
+        parent.repaint();
+      }
     });
-
-
+    
 
     // Create the red range input
         JPanel redPanel = new JPanel();
@@ -189,6 +195,12 @@ public class MainPanel extends JPanel{
     setLayout(new BorderLayout());
     add(sidebar, BorderLayout.WEST);
     add(gridPanel, BorderLayout.CENTER);
+    add(textPanel, BorderLayout.PAGE_START);
+    TextUI textmanager = new TextUI(5, 500, 300, 300, Color.white); 
+    textmanager.setText("press \"shift\" to draw continuously");
+    textPanel.add(textmanager.getLabel()); 
+
+
   }
 
   public JPanel updateColorSquare(int red, int green, int blue) {
@@ -202,5 +214,8 @@ public class MainPanel extends JPanel{
     return drawingColor;
   }
 
+  
+  
+  
 
 }

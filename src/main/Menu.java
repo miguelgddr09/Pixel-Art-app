@@ -5,8 +5,11 @@ import java.awt.event.*;
 import javax.swing.*;
 import Panels.MainPanel;
 
+
 public class Menu extends JPanel {
     private JButton showButton;
+
+
 
     public Menu() {
         // Set the background color and preferred size of the panel
