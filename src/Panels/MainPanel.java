@@ -362,6 +362,24 @@ public class MainPanel extends JPanel {
             dialog.dispose();
           }
         });
+
+        jpgButton.addActionListener(new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e ) {
+            mFilename = mTextInputField.getText();
+            saveAsJpg();
+            dialog.dispose();
+          }
+        });
+
+        gifButton.addActionListener(new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            mFilename = mTextInputField.getText();
+            saveAsGif();
+            dialog.dispose();
+          }
+        });
         
         // Configurar el diálogo
         dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -413,6 +431,18 @@ public class MainPanel extends JPanel {
 
   public void saveAsPng() {
     format = "png";
+    System.out.println(format);
+    saveAs(mFilename, format);
+  }
+
+  public void saveAsJpg() {
+    format = "jpg";
+    System.out.println(format);
+    saveAs(mFilename, format);
+  }
+
+  public void saveAsGif() {
+    format = "gif";
     System.out.println(format);
     saveAs(mFilename, format);
   }

@@ -42,8 +42,8 @@ public class Menu extends JPanel {
                 fileChooser.setCurrentDirectory(new File("."));
                 fileChooser.showSaveDialog(null);
                 File selectedFile = fileChooser.getSelectedFile();
-                String path = selectedFile.getAbsolutePath();
                 if (selectedFile != null) {
+                    String path = selectedFile.getAbsolutePath();
                     if (path.endsWith(".png") || path.endsWith(".jpg") || path.endsWith(".gif")) {
                     //Save the image at the selected path
                     } else {
