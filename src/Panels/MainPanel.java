@@ -1,9 +1,8 @@
 package Panels;
 
-import javax.swing.JPanel;
 import java.awt.*;
 import javax.swing.*;
-import javax.swing.BorderFactory;
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.event.ChangeEvent;
@@ -12,17 +11,26 @@ import javax.swing.event.ChangeListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import main.App;
 import main.Menu;
 import textUI.TextUI;
 
 public class MainPanel extends JPanel{
   private JButton backToMenuBtn, savingOpt;
+  protected JButton pngButton, jpgButton, gifButton;
+  protected JButton penButton, eraserButton, eraseAll;
+  protected JDialog dialog;
   public JPanel colorSquare;
   public JPanel sidebar, gridPanel, textPanel;
   private final int rows;
   private final int cols;
   private final JPanel[][] squares;
   public Color pencil;
+  protected String format = "";
+  protected boolean isPen = true, isEraser = false, isEraseAll = false;
+
+  JFrame frame = App.frame;
+  TextUI textmanager = new TextUI(5, 500, 300, 300, Color.white); 
 
 
   public JSlider redSlider = new JSlider(0, 255),
@@ -69,6 +77,7 @@ public class MainPanel extends JPanel{
         redSlider.setPaintTicks(true);
         redSlider.setPaintLabels(true);
         redSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
+        redSlider.setBackground(Color.gray);
         redPanel.add(redLabel);
         redPanel.add(redSlider);
         redSlider.setValue(0);
@@ -92,6 +101,7 @@ public class MainPanel extends JPanel{
         greenSlider.setPaintTicks(true);
         greenSlider.setPaintLabels(true);
         greenSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
+        greenSlider.setBackground(Color.gray);
         greenPanel.add(greenLabel);
         greenPanel.add(greenSlider);
         greenSlider.setValue(0);
@@ -115,6 +125,7 @@ public class MainPanel extends JPanel{
         blueSlider.setPaintTicks(true);
         blueSlider.setPaintLabels(true);
         blueSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
+        blueSlider.setBackground(Color.gray);
         bluePanel.add(blueLabel);
         bluePanel.add(blueSlider);
         blueSlider.addChangeListener(new ChangeListener() {
@@ -145,6 +156,41 @@ public class MainPanel extends JPanel{
       inputPanel.add(bluePanel);
       sidebar.add(inputPanel, BorderLayout.CENTER);
 
+      // Create pen & eraser buttons
+      JPanel middPanel = new JPanel();
+      middPanel.setLayout(new BoxLayout(middPanel, BoxLayout.Y_AXIS));
+      middPanel.setBackground(Color.gray);
+      penButton =  new JButton("pen");
+      eraserButton = new JButton("eraser");
+      eraseAll = new JButton("erase all");
+
+      penButton.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+          isEraser = false;
+          isPen = true;
+          textmanager.setText("press \"shift\" to draw continuously \t pen on");
+          System.out.println("pen " +  isPen);
+          System.out.println("eraser " +  isEraser);
+        }
+      });
+
+      eraserButton.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+          isEraser = true;
+          isPen = false;
+          textmanager.setText("press \"shift\" to erase continously \t eraser on");
+          System.out.println("pen " +  isPen);
+          System.out.println("eraser " +  isEraser);
+        }
+      });
+
+      middPanel.add(penButton);
+      middPanel.add(eraserButton);
+
+      sidebar.add(middPanel, BorderLayout.CENTER);
+
       // Create the color square panel
       colorSquare = new JPanel();
       colorSquare.setPreferredSize(new Dimension(200, 200));
@@ -170,8 +216,13 @@ public class MainPanel extends JPanel{
                     @Override
                     public void mouseEntered(MouseEvent e) {
                         if (e.isShiftDown()) {
-                          System.out.println(pencil);
-                          square.setBackground(pencil);
+                          if(isPen) {
+                            square.setBackground(pencil);
+                          }
+
+                          if(isEraser) {
+                            square.setBackground(Color.white);
+                          }
                           //
                         }
                     }
@@ -182,7 +233,13 @@ public class MainPanel extends JPanel{
                     
                     @Override
                     public void mousePressed(MouseEvent e) {
-                      square.setBackground(pencil);
+                      if(isPen) {
+                        square.setBackground(pencil);
+                      }
+
+                      if(isEraser) {
+                        square.setBackground(Color.white);
+                      }
                     }
                     
                     @Override
@@ -196,9 +253,62 @@ public class MainPanel extends JPanel{
     add(sidebar, BorderLayout.WEST);
     add(gridPanel, BorderLayout.CENTER);
     add(textPanel, BorderLayout.PAGE_START);
-    TextUI textmanager = new TextUI(5, 500, 300, 300, Color.white); 
-    textmanager.setText("press \"shift\" to draw continuously");
-    textPanel.add(textmanager.getLabel()); 
+
+
+    //default mess
+    textmanager.setText("press \"shift\" to draw continuously \t pen on");
+    textPanel.add(textmanager.getLabel());
+
+    savingOpt = new JButton("Save");
+    savingOpt.addActionListener(new ActionListener() {
+    public void actionPerformed(ActionEvent e) {
+        // Crear el diálogo modal
+        dialog = new JDialog(frame, "Save As", true);
+        
+        // Crear el panel con los botones
+        JPanel panel = new JPanel(new GridLayout(5, 1));
+        JLabel fieldInstructions = new JLabel("Enter name of the file:");
+        JTextField mTextInputField = new JTextField(20);
+        pngButton = new JButton("PNG");
+        jpgButton = new JButton("JPG");
+        gifButton = new JButton("GIF");
+        panel.add(fieldInstructions);
+        panel.add(mTextInputField);
+        panel.add(pngButton);
+        panel.add(jpgButton);
+        panel.add(gifButton);
+
+        
+        
+        // Agregar el panel al diálogo
+        dialog.add(panel);
+
+        pngButton.addActionListener(new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            saveAsPng();
+            dialog.dispose();
+          }
+        });
+        
+        // Configurar el diálogo
+        dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        dialog.pack();
+        dialog.setLocationRelativeTo(frame);
+        dialog.setVisible(true);
+        
+
+      }
+    });
+       
+    savingOpt.setLayout(new BoxLayout( savingOpt, BoxLayout.Y_AXIS));
+    savingOpt.setAlignmentX(LEFT_ALIGNMENT);
+
+    JPanel bottomPanel = new JPanel();
+    bottomPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
+    bottomPanel.setBackground(Color.darkGray);
+    bottomPanel.add(savingOpt);
+    sidebar.add(bottomPanel, BorderLayout.SOUTH);
 
 
   }
@@ -212,6 +322,11 @@ public class MainPanel extends JPanel{
     Color drawingColor = new Color(red, green, blue);
     pencil = drawingColor;
     return drawingColor;
+  }
+
+  public void saveAsPng() {
+    format = "png";
+    System.out.println(format);
   }
 
   

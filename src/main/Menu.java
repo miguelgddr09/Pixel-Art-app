@@ -8,8 +8,8 @@ import Panels.MainPanel;
 
 public class Menu extends JPanel {
     private JButton showButton;
-
-
+    protected JCheckBox checkBox1, checkBox2, checkBox3, checkBox4;
+    public int gridSize = 40;
 
     public Menu() {
         // Set the background color and preferred size of the panel
@@ -29,6 +29,90 @@ public class Menu extends JPanel {
         showButton = new JButton("Show Grid");
         add(showButton, gbc);
 
+        // Create checkboxes with the specified labels and add them to the panel
+        //gbc.gridx = 0;
+        //gbc.gridy = 1;
+        //gbc.fill = GridBagConstraints.WEST;
+
+        ButtonGroup buttonGroup = new ButtonGroup();
+        
+        // Create the checkboxes and add them to the panel and the button group
+        checkBox1 = new JCheckBox("40x40");
+        checkBox1.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        checkBox1.setBackground(Color.darkGray);
+        checkBox1.setForeground(Color.white);
+        checkBox1.setPreferredSize(new Dimension(60, 60));
+        checkBox1.setSelected(true);
+        checkBox1.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                gridSize = 40;
+                System.out.println(gridSize);
+                checkBox2.setSelected(false);
+                checkBox3.setSelected(false);
+                checkBox4.setSelected(false);
+            }
+        });
+        gbc.gridy++;
+        add(checkBox1, gbc);
+        buttonGroup.add(checkBox1);
+
+        checkBox2 = new JCheckBox("45x45");
+        checkBox2.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        checkBox2.setBackground(Color.darkGray);
+        checkBox2.setForeground(Color.white);
+        checkBox2.setPreferredSize(new Dimension(60, 60));
+        checkBox2.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                gridSize = 45;
+                System.out.println(gridSize);
+                checkBox1.setSelected(false);
+                checkBox3.setSelected(false);
+                checkBox4.setSelected(false);
+            }
+        });
+        gbc.gridy++;
+        add(checkBox2, gbc);
+        buttonGroup.add(checkBox2);
+
+        checkBox3 = new JCheckBox("50x50");
+        checkBox3.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        checkBox3.setBackground(Color.darkGray);
+        checkBox3.setForeground(Color.white);
+        checkBox3.setPreferredSize(new Dimension(60, 60));
+        checkBox3.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                gridSize = 50;
+                System.out.println(gridSize);
+                checkBox1.setSelected(false);
+                checkBox2.setSelected(false);
+                checkBox4.setSelected(false);
+            }
+        });
+        gbc.gridy++;
+        add(checkBox3, gbc);
+        buttonGroup.add(checkBox3);
+
+        checkBox4 = new JCheckBox("55x55");
+        checkBox4.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        checkBox4.setBackground(Color.darkGray);
+        checkBox4.setForeground(Color.white);
+        checkBox4.setPreferredSize(new Dimension(60, 60));
+        checkBox4.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                gridSize = 55;
+                System.out.println(gridSize);
+                checkBox1.setSelected(false);
+                checkBox2.setSelected(false);
+                checkBox3.setSelected(false);
+            }
+        });
+        gbc.gridy++;
+        add(checkBox4, gbc);
+        buttonGroup.add(checkBox4);
+
+        
+
+
         // Add an ActionListener to the button to handle clicks
         showButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -36,7 +120,7 @@ public class Menu extends JPanel {
                 removeAll();
 
                 // Add the "MainPanel" to the center of the panel
-                MainPanel mainPanel = new MainPanel(40, 40);
+                MainPanel mainPanel = new MainPanel(gridSize, gridSize);
                 setLayout(new BorderLayout());
                 add(mainPanel, BorderLayout.CENTER);
 

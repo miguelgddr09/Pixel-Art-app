@@ -4,9 +4,11 @@ import javax.swing.*;
 
 public class App {
 
+    public static JFrame frame;
+
     public static void main(String[] args) {
         // Crear la ventana principal
-        JFrame frame = new JFrame("Aplicación de Pixel Art");
+        frame = new JFrame("Aplicación de Pixel Art");
 
         //configurations
         frame.setSize(800, 600);
