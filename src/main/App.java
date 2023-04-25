@@ -8,7 +8,7 @@ public class App {
 
     public static void main(String[] args) {
         // Crear la ventana principal
-        frame = new JFrame("Aplicación de Pixel Art");
+        frame = new JFrame("Los tilines Pixel Art");
 
         //configurations
         frame.setSize(800, 600);

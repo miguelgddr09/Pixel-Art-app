@@ -1,10 +1,16 @@
 package Panels;
 
 import java.awt.*;
+
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -15,7 +21,7 @@ import main.App;
 import main.Menu;
 import textUI.TextUI;
 
-public class MainPanel extends JPanel{
+public class MainPanel extends JPanel {
   private JButton backToMenuBtn, savingOpt;
   protected JButton pngButton, jpgButton, gifButton;
   protected JButton penButton, eraserButton, eraseAll;
@@ -28,6 +34,14 @@ public class MainPanel extends JPanel{
   public Color pencil;
   protected String format = "";
   protected boolean isPen = true, isEraser = false, isEraseAll = false;
+  public JPanel square;
+  public int redVal = 0, greenVal = 0, blueVal = 0;
+  protected boolean smallLoop = false;
+
+  protected Color[] colors = { Color.BLACK, Color.WHITE, Color.RED, Color.ORANGE, Color.YELLOW, Color.GREEN, Color.BLUE, Color.CYAN, Color.MAGENTA, Color.PINK };
+  public Color selectedColor;
+
+  protected String mFilename = "";
 
   JFrame frame = App.frame;
   TextUI textmanager = new TextUI(5, 500, 300, 300, Color.white); 
@@ -46,12 +60,12 @@ public class MainPanel extends JPanel{
     sidebar = new JPanel();
     gridPanel = new JPanel();
     gridPanel.setLayout(new GridLayout(rows, cols));
-    gridPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-    sidebar.setPreferredSize(new Dimension(220, 1));
+    sidebar.setPreferredSize(new Dimension(220, 0));
     sidebar.setBackground(Color.darkGray);
 
     textPanel = new JPanel();
-    textPanel.setPreferredSize(new Dimension(1, 25));
+    textPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 0 , 0));
+    //textPanel.setPreferredSize(new Dimension(1, 25));
     textPanel.setBackground(Color.darkGray);
     
     backToMenuBtn = new JButton("Back to Menu");
@@ -71,7 +85,7 @@ public class MainPanel extends JPanel{
         JPanel redPanel = new JPanel();
         redPanel.setLayout(new BoxLayout(redPanel, BoxLayout.Y_AXIS));
         JLabel redLabel = new JLabel("Red");
-        redSlider = new JSlider(0, 255, 0);
+        redSlider = new JSlider(0, 255, redVal);
         redSlider.setMajorTickSpacing(50);
         redSlider.setMinorTickSpacing(10);
         redSlider.setPaintTicks(true);
@@ -84,10 +98,13 @@ public class MainPanel extends JPanel{
         redSlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 int red = redSlider.getValue();
+                redVal = redSlider.getValue();
                 int green = greenSlider.getValue();
+                greenVal = greenSlider.getValue();
                 int blue = blueSlider.getValue();
-                updateColorSquare(red, green, blue);
+                blueVal = blueSlider.getValue();
                 getCurrColor(red, green, blue);
+                updateColorSquare(red, green, blue);
             }
         });
 
@@ -95,7 +112,7 @@ public class MainPanel extends JPanel{
         JPanel greenPanel = new JPanel();
         greenPanel.setLayout(new BoxLayout(greenPanel, BoxLayout.Y_AXIS));
         JLabel greenLabel = new JLabel("Green");
-        greenSlider = new JSlider(0, 255, 0);
+        greenSlider = new JSlider(0, 255, greenVal);
         greenSlider.setMajorTickSpacing(50);
         greenSlider.setMinorTickSpacing(10);
         greenSlider.setPaintTicks(true);
@@ -108,10 +125,13 @@ public class MainPanel extends JPanel{
         greenSlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 int red = redSlider.getValue();
+                redVal = redSlider.getValue();
                 int green = greenSlider.getValue();
+                greenVal = greenSlider.getValue();
                 int blue = blueSlider.getValue();
-                updateColorSquare(red, green, blue);
+                blueVal = blueSlider.getValue();
                 getCurrColor(red, green, blue);
+                updateColorSquare(red, green, blue);
             }
         });
 
@@ -119,7 +139,7 @@ public class MainPanel extends JPanel{
         JPanel bluePanel = new JPanel();
         bluePanel.setLayout(new BoxLayout(bluePanel, BoxLayout.Y_AXIS));
         JLabel blueLabel = new JLabel("Blue");
-        blueSlider = new JSlider(0, 255, 0);
+        blueSlider = new JSlider(0, 255, blueVal);
         blueSlider.setMajorTickSpacing(50);
         blueSlider.setMinorTickSpacing(10);
         blueSlider.setPaintTicks(true);
@@ -131,20 +151,22 @@ public class MainPanel extends JPanel{
         blueSlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 int red = redSlider.getValue();
+                redVal = redSlider.getValue();
                 int green = greenSlider.getValue();
+                greenVal = greenSlider.getValue();
                 int blue = blueSlider.getValue();
-                updateColorSquare(red, green, blue);
+                blueVal = blueSlider.getValue();
                 getCurrColor(red, green, blue);
+                updateColorSquare(red, green, blue);
             }
         });
 
 
         // Add the back button to the panel with some margin
-     JPanel topPanel = new JPanel();
-     topPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
+     JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5 , 0));
      topPanel.setBackground(Color.darkGray);
      topPanel.add(backToMenuBtn);
-     sidebar.add(topPanel, BorderLayout.NORTH);
+     //sidebar.add(topPanel, BorderLayout.NORTH);
 
      //adding range panels
       JPanel inputPanel = new JPanel();
@@ -155,6 +177,33 @@ public class MainPanel extends JPanel{
       inputPanel.add(greenPanel);
       inputPanel.add(bluePanel);
       sidebar.add(inputPanel, BorderLayout.CENTER);
+
+      JPanel defaultColorsPanel = new JPanel();
+      defaultColorsPanel.setLayout(new GridLayout(2, 0));
+      defaultColorsPanel.setBackground(Color.darkGray);
+      // loop through the colors array and create a button for each color
+      for (Color c : colors) {
+      JButton colorButton = new JButton();
+      colorButton.setPreferredSize(new Dimension(20, 20));
+      colorButton.setBackground(c);
+      colorButton.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            // set the selected color to the button's background color
+            selectedColor = c;
+            smallLoop = true;
+            if (smallLoop) {
+              updateBlueSilder(selectedColor);
+              updateRedSlider(selectedColor);
+              updateGreenSlider(selectedColor);
+              smallLoop = false;
+            }
+        }
+    });
+    defaultColorsPanel.add(colorButton);
+    }
+
+    sidebar.add(defaultColorsPanel, BorderLayout.CENTER);
 
       // Create pen & eraser buttons
       JPanel middPanel = new JPanel();
@@ -186,8 +235,28 @@ public class MainPanel extends JPanel{
         }
       });
 
+      eraseAll.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+          isEraseAll = true;
+          System.out.println("erasing all");
+
+          if (isEraseAll) {
+            // erase the grid
+            for (int row = 0; row < rows; row++) {
+                for (int col = 0; col < cols; col++) {
+                    squares[row][col].setBackground(Color.white);
+                }
+            }
+
+            isEraseAll = false;
+          }
+        }
+      });
+
       middPanel.add(penButton);
       middPanel.add(eraserButton);
+      middPanel.add(eraseAll);
 
       sidebar.add(middPanel, BorderLayout.CENTER);
 
@@ -200,7 +269,8 @@ public class MainPanel extends JPanel{
 
     for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
-                JPanel square = new JPanel();
+                //JPanel square = new JPanel();
+                square = new JPanel();
                 square.setPreferredSize(new Dimension(50, 50)); // Set the size of each square
                 square.setBackground(Color.white);
                 square.setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -282,10 +352,12 @@ public class MainPanel extends JPanel{
         
         // Agregar el panel al diálogo
         dialog.add(panel);
-
+        
         pngButton.addActionListener(new ActionListener() {
           @Override
           public void actionPerformed(ActionEvent e) {
+            mFilename = mTextInputField.getText();
+            System.out.println(mFilename); 
             saveAsPng();
             dialog.dispose();
           }
@@ -303,18 +375,18 @@ public class MainPanel extends JPanel{
        
     savingOpt.setLayout(new BoxLayout( savingOpt, BoxLayout.Y_AXIS));
     savingOpt.setAlignmentX(LEFT_ALIGNMENT);
+    topPanel.add(savingOpt);
 
-    JPanel bottomPanel = new JPanel();
-    bottomPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
-    bottomPanel.setBackground(Color.darkGray);
-    bottomPanel.add(savingOpt);
-    sidebar.add(bottomPanel, BorderLayout.SOUTH);
+     sidebar.add(topPanel, BorderLayout.NORTH);
+
+  
 
 
   }
 
   public JPanel updateColorSquare(int red, int green, int blue) {
-    colorSquare.setBackground(new Color(red, green, blue));
+    //colorSquare.setBackground(new Color(red, green, blue));
+    colorSquare.setBackground(pencil);
     return colorSquare;
   }
 
@@ -324,9 +396,42 @@ public class MainPanel extends JPanel{
     return drawingColor;
   }
 
+  public void updateRedSlider (Color theColor) {
+    redVal = theColor.getRed();
+    redSlider.setValue(redVal);
+  }
+
+  public void updateGreenSlider (Color theColor) {
+    greenVal = theColor.getGreen();
+    greenSlider.setValue(greenVal);
+  }
+
+  public void updateBlueSilder (Color theColor) {
+    blueVal = theColor.getBlue();
+    blueSlider.setValue(blueVal);
+  }
+
   public void saveAsPng() {
     format = "png";
     System.out.println(format);
+    saveAs(mFilename, format);
+  }
+
+  private void saveAs(String theFileName, String format) {
+    try {
+      // Create an image in the required format
+      ImageIO.write(getPanelImage(), format, new File(theFileName + "." + format));
+    } catch (IOException ex) {
+    System.err.println("Problem occurred creating image.");
+    }
+  }
+
+  public BufferedImage getPanelImage() {
+    BufferedImage image = new BufferedImage(gridPanel.getSize().width, gridPanel.getSize().height, BufferedImage.TYPE_3BYTE_BGR);
+    Graphics2D g = image.createGraphics();
+    gridPanel.paint(g);
+    g.dispose();
+    return image;
   }
 
   

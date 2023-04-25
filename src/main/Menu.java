@@ -2,12 +2,14 @@ package main;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
+
 import javax.swing.*;
 import Panels.MainPanel;
 
 
 public class Menu extends JPanel {
-    private JButton showButton;
+    private JButton showButton, showCurrCanvas;
     protected JCheckBox checkBox1, checkBox2, checkBox3, checkBox4;
     public int gridSize = 40;
 
@@ -26,13 +28,33 @@ public class Menu extends JPanel {
         gbc.fill = GridBagConstraints.CENTER;
 
         // Create the "Show Grid" button and add it to the panel
-        showButton = new JButton("Show Grid");
+        showButton = new JButton("start new canvas");
         add(showButton, gbc);
 
-        // Create checkboxes with the specified labels and add them to the panel
-        //gbc.gridx = 0;
-        //gbc.gridy = 1;
-        //gbc.fill = GridBagConstraints.WEST;
+        showCurrCanvas = new JButton("load canvas");
+        gbc.gridy++;
+        add(showCurrCanvas, gbc);
+
+        showCurrCanvas.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setCurrentDirectory(new File("."));
+                fileChooser.showSaveDialog(null);
+                File selectedFile = fileChooser.getSelectedFile();
+                String path = selectedFile.getAbsolutePath();
+                if (selectedFile != null) {
+                    if (path.endsWith(".png") || path.endsWith(".jpg") || path.endsWith(".gif")) {
+                    //Save the image at the selected path
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Invalid file format! Please select PNG, JPG or GIF.", 
+                                           "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                } 
+ 
+            } 
+        });
+        
 
         ButtonGroup buttonGroup = new ButtonGroup();
         
